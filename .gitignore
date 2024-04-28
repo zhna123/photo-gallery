@@ -34,3 +34,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# mock data
+/public/images*
+/public/thumbnail*
+/public/photos.csv
+
