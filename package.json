@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "deploy-test": "node scripts/sync_to_test.js",
+    "deploy-prod": "node scripts/sync_to_prod.js"
   },
   "dependencies": {
     "@mdi/js": "^7.4.47",
