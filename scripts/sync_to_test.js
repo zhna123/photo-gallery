@@ -25,6 +25,7 @@ function main() {
   runCommand(`aws s3 cp out/index.html s3://${s3bucketname}/index.html`);
   runCommand(`aws s3 cp out/index.txt s3://${s3bucketname}/index.txt`);
   runCommand(`aws s3 cp out/logo.svg s3://${s3bucketname}/logo.svg`);
+  runCommand(`aws s3 cp out/photos.csv s3://${s3bucketname}/photos.csv`);
   runCommand(`aws s3 sync --follow-symlinks out/_next s3://${s3bucketname}/_next`);
   runCommand(`aws s3 sync --follow-symlinks out/images s3://${s3bucketname}/images`);
   runCommand(`aws s3 sync --follow-symlinks out/thumbnail s3://${s3bucketname}/thumbnail`);

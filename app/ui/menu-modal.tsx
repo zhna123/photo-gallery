@@ -39,7 +39,7 @@ export default function MenuModal({setShowMenu, currentYear, yearChange}:
             )
           })
         }
-      </ul>
+        </ul>
       </div>
       
     </ModalLayout>

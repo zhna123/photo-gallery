@@ -31,20 +31,21 @@ export default function PaginationPage (
   }
 
   return (
-    <div className="flex flex-col h-36 min-h-[calc(100vh-3rem)] sm:min-h-[calc(100vh-9rem)]">
-      <div className="columns-2 md:columns-3 gap-1 lg:gap-2 mb-6">
+    <div className="flex flex-col my-4 gap-4 w-full">
+      <Pagination totalItems={totalItems} currentPage={currentPage} itemsPerPage={itemsPerPage} paginate={paginate} />
+      <div className="flex flex-wrap gap-2 w-full">
         {
           photos && photos.map( (photo, index) => {
             const timestamp = new Date(photo.datetime).getTime();
             return (
-                <div key={timestamp + index} className="mb-1 lg:mb-2" onClick={() => showPhotoModal(photo)}>
-                  <img alt="family photos" className={`w-full aspect-[${photo.aspect_ratio}]`} src={`thumbnail/${photo.filename}`}/>
+                <div key={timestamp + index} className={`grow basis-[40%] sm:basis-[21%] h-[20vh] sm:h-[40vh] aspect-[${photo.aspect_ratio}] bg-gray-800`} onClick={() => showPhotoModal(photo)}>
+                  <img alt="family photos" className="w-full h-full object-cover" src={`thumbnail/${photo.filename}`}/>
                 </div>
             )
           })
         }
+        <div className="grow-[10]"></div>
       </div>
-      <Pagination totalItems={totalItems} currentPage={currentPage} itemsPerPage={itemsPerPage} paginate={paginate} />
     </div>
   )
 }

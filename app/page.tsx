@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import PhotoModal from "./ui/photo-modal";
 import useCSVData, { PhotoData } from "./hooks/PhotoData";
 import PaginationPage from "./components/PaginationPage";
@@ -27,15 +27,24 @@ export default function Home() {
 
   const paginate = (p: number) => {
     setCurrentPage(p)
+    if (ref.current) {
+      ref.current.scrollIntoView();
+    }
   }
 
   const yearChange = (year: number) => {
     setCurrentYear(year)
     setCurrentPage(1)
+    setShowMenu(false)
+    if (ref.current) {
+      ref.current.scrollIntoView();
+    }
   }
 
+  const ref = useRef<null | HTMLDivElement>(null); 
+
   return (
-    <main className="flex min-h-screen flex-col gap-4 py-4 px-2 lg:p-4 text-gray-800">
+    <main className="flex min-h-screen w-full flex-col gap-4 py-4 px-2 lg:p-4 text-gray-800">
       <header className="sticky top-0 w-full h-12 sm:h-24 sm:self-center sm:static flex justify-between sm:justify-center sm:items-center">
           <img src="logo.svg" alt="family gallery logo" className="w-16 sm:w-24" />
           <div className="sm:hidden" onClick={()=>setShowMenu(true)}>
@@ -46,9 +55,9 @@ export default function Home() {
         {
           YEARS.map((year, index) => {
             const className = clsx(
-              'py-2 px-4 border rounded-md cursor-pointer border',
+              'py-2 px-4 border rounded-md cursor-pointer border hover:bg-gray-100',
               {
-                'bg-gallery_blue text-off_white': year === currentYear
+                'bg-gallery_blue text-off_white hover:bg-gallery_blue': year === currentYear
               }
             )
             return (
@@ -61,6 +70,7 @@ export default function Home() {
         }
       </ul>
       {isLoading && <Skeleton />}
+      <div ref={ref}></div>
       {photos && 
         <PaginationPage 
           photos={photos} 
