@@ -20,26 +20,23 @@ export default function Home() {
 
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear())
 
-  const [currentPage, setCurrentPage] = useState(1)
-  const { photos, total, isLoading, isError } = useCSVData({year: currentYear, limit: ITEM_PER_PAGE, page: currentPage})
+  const [cnt, setCnt] = useState(1);
+  const { photos, total, isLoading, isError } = useCSVData({year: currentYear, limit: ITEM_PER_PAGE, pageCnt: cnt})
 
   const [showMenu, setShowMenu] = useState(false)
 
-  const paginate = (p: number) => {
-    setCurrentPage(p)
-    if (ref.current) {
-      ref.current.scrollIntoView();
-    }
-  }
-
   const yearChange = (year: number) => {
     setCurrentYear(year)
-    setCurrentPage(1)
+    setCnt(1)
     setShowMenu(false)
     if (ref.current) {
       ref.current.scrollIntoView();
     }
   }
+
+  const loadMore = () => {
+    setCnt(prevCnt => prevCnt + 1);
+  };
 
   const ref = useRef<null | HTMLDivElement>(null); 
 
@@ -55,9 +52,10 @@ export default function Home() {
         {
           YEARS.map((year, index) => {
             const className = clsx(
-              'py-2 px-4 border rounded-md cursor-pointer border hover:bg-gray-100',
+              'py-2 px-4 border rounded-md cursor-pointer',
               {
-                'bg-gallery_blue text-off_white hover:bg-gallery_blue': year === currentYear
+                'bg-gallery_blue text-off_white hover:bg-gallery_blue': year === currentYear,
+                'hover:bg-gray-100': year !== currentYear
               }
             )
             return (
@@ -75,11 +73,17 @@ export default function Home() {
         <PaginationPage 
           photos={photos} 
           totalItems={total!} 
-          currentPage={currentPage} 
-          itemsPerPage={ITEM_PER_PAGE} 
-          paginate={paginate}
           setShowModal={setShowModal} 
           setCurrentPhoto={setCurrentPhoto} />
+      }
+      {
+        photos &&
+        cnt * ITEM_PER_PAGE < total! && (
+          <button className="py-2 px-4 w-1/2 mx-auto border border-gray-800 rounded-md cursor-pointer" 
+            onClick={loadMore}>
+              Load More
+          </button>
+        )
       }
       { showMenu && <MenuModal setShowMenu={setShowMenu} currentYear={currentYear} yearChange={yearChange} /> }
       { showModal && <PhotoModal currentPhoto={currentPhoto} setShowModal={setShowModal}/>}

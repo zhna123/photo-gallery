@@ -24,15 +24,15 @@ async function fetchCSVData(url: string): Promise<PhotoData[]> {
   return photos;
 }
 
-export default function useCSVData({year, limit, page}: {year: number, limit: number, page: number}) {
+export default function useCSVData({year, limit, pageCnt}: {year: number, limit: number, pageCnt: number}) {
   const { data, error, isLoading } = useSWR(
     `photos.csv`,
     fetchCSVData,
   )
   const dataForYear = data?.filter(p => new Date(p.datetime).getFullYear() === year)
-  const paginatedData = dataForYear?.slice((page-1) * limit, page * limit)
+  const currentData = dataForYear?.slice(0, pageCnt * limit)
   return {
-    photos: paginatedData,
+    photos: currentData,
     total: dataForYear?.length,
     isLoading,
     isError: error

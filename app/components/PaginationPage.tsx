@@ -1,24 +1,17 @@
 /* eslint-disable @next/next/no-img-element */
 import { PhotoData } from "../hooks/PhotoData";
-import Pagination from "./Pagination";
 
 
 export default function PaginationPage (
   {
     photos,
     totalItems,
-    currentPage,
-    itemsPerPage,
-    paginate,
     setShowModal,
     setCurrentPhoto
   }: 
   {
     photos: PhotoData[],
     totalItems: number,
-    currentPage: number,
-    itemsPerPage: number,
-    paginate: (p: number) => void,
     setShowModal: (a: boolean) => void,
     setCurrentPhoto: (a: PhotoData) => void
   }
@@ -32,7 +25,6 @@ export default function PaginationPage (
 
   return (
     <div className="flex flex-col my-4 gap-4 w-full">
-      <Pagination totalItems={totalItems} currentPage={currentPage} itemsPerPage={itemsPerPage} paginate={paginate} />
       <div className="flex flex-wrap gap-2 w-full">
         {
           photos && photos.map( (photo, index) => {
