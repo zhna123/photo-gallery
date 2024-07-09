@@ -3,14 +3,19 @@
 
 import { useRef, useState } from "react";
 import PhotoModal from "./ui/photo-modal";
-import useCSVData, { PhotoData } from "./hooks/PhotoData";
-import PaginationPage from "./components/PaginationPage";
+import usePhotoData, { PhotoData } from "./hooks/PhotoData";
+import useVideoData, { VideoData } from "./hooks/VideoData";
 import { ITEM_PER_PAGE, YEARS } from "./lib/constant";
 import Skeleton from "./ui/skeleton";
 import clsx from 'clsx';
 import Icon from '@mdi/react';
 import { mdiMenu } from '@mdi/js';
+import { mdiArrowUp } from '@mdi/js';
 import MenuModal from "./ui/menu-modal";
+import PhotosPage from "./components/PhotosPage";
+import VideosPage from "./components/VideosPage";
+import InfiniteLoading from "./components/InfiniteLoading";
+import VideoModal from "./ui/video-modal";
 
 
 export default function Home() {
@@ -18,24 +23,39 @@ export default function Home() {
   const [showModal, setShowModal] = useState(false)
   const [currentPhoto, setCurrentPhoto] = useState<PhotoData>()
 
+  const [currentVideo, setCurrentVideo] = useState<VideoData>()
+
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear())
 
-  const [cnt, setCnt] = useState(1);
-  const { photos, total, isLoading, isError } = useCSVData({year: currentYear, limit: ITEM_PER_PAGE, pageCnt: cnt})
+  const [photoPageCnt, setPhotoPageCnt] = useState(1);
+  const [videoPageCnt, setVideoPageCnt] = useState(1);
+  const { photos, total: photoTotal, isLoading: photoLoading, isError: photoError } = usePhotoData({year: currentYear, limit: ITEM_PER_PAGE, pageCnt: photoPageCnt})
+  const { videos, total: videoTotal, isLoading: videoLoading, isError: videoError } = useVideoData({year: currentYear, limit: ITEM_PER_PAGE, pageCnt: videoPageCnt})
 
   const [showMenu, setShowMenu] = useState(false)
 
+  const [showVideosTab, setShowVideosTab] = useState(false);
+
   const yearChange = (year: number) => {
     setCurrentYear(year)
-    setCnt(1)
+    setPhotoPageCnt(1)
+    setVideoPageCnt(1)
     setShowMenu(false)
+    scrollToTop()
+  }
+
+  const scrollToTop = () => {
     if (ref.current) {
       ref.current.scrollIntoView();
     }
   }
 
-  const loadMore = () => {
-    setCnt(prevCnt => prevCnt + 1);
+  const loadMorePhotos = () => {
+    setPhotoPageCnt(prevCnt => prevCnt + 1);
+  };
+
+  const loadMoreVideos = () => {
+    setVideoPageCnt(prevCnt => prevCnt + 1);
   };
 
   const ref = useRef<null | HTMLDivElement>(null); 
@@ -67,26 +87,62 @@ export default function Home() {
           })
         }
       </ul>
-      {isLoading && <Skeleton />}
+      <ul className="self-center flex justify-between p-2 leading-8 w-[150px] bg-gray-200 rounded-full">
+        <li 
+          className={`rounded-full px-4 cursor-pointer ${!showVideosTab ? 'bg-gallery_blue text-white':''}`}
+          onClick={()=>{
+            setShowVideosTab(false)
+            setPhotoPageCnt(1)
+          }}
+        >
+            相片
+        </li>
+        <li 
+          className={`rounded-full px-4 cursor-pointer ${showVideosTab ? 'bg-gallery_blue text-white':''}`}
+          onClick={()=>{
+            setShowVideosTab(true)
+            setVideoPageCnt(1)
+          }}
+        >
+            视频
+        </li>
+      </ul>
+      {photoLoading && <Skeleton />}
+      {videoLoading && <Skeleton />}
       <div ref={ref}></div>
-      {photos && 
-        <PaginationPage 
+      {!showVideosTab && photos && 
+        <PhotosPage 
           photos={photos} 
-          totalItems={total!} 
+          totalItems={photoTotal!} 
           setShowModal={setShowModal} 
           setCurrentPhoto={setCurrentPhoto} />
       }
       {
-        photos &&
-        cnt * ITEM_PER_PAGE < total! && (
-          <button className="py-2 px-4 w-1/2 mx-auto border border-gray-800 rounded-md cursor-pointer" 
-            onClick={loadMore}>
-              Load More
-          </button>
-        )
+        !showVideosTab &&
+        <InfiniteLoading cnt={photoPageCnt} total={photoTotal!} loadMore={loadMorePhotos} />
       }
+      {
+        showVideosTab && videos &&
+        <VideosPage
+          videos={videos} 
+          totalItems={videoTotal!}
+          setShowModal={setShowModal}
+          setCurrentVideo={setCurrentVideo}/>
+      }
+
+      {
+        showVideosTab &&
+        <InfiniteLoading cnt={videoPageCnt} total={videoTotal!} loadMore={loadMoreVideos} />
+      }
+
+      <div onClick={scrollToTop}>
+        <Icon path={mdiArrowUp} size={2} className="fixed bottom-0 right-0 text-gallery_blue m-2" />
+      </div>
+      
+      { !showVideosTab && showModal && <PhotoModal currentPhoto={currentPhoto} setShowModal={setShowModal}/>}
+      { showVideosTab && showModal && <VideoModal currentVideo={currentVideo} setShowModal={setShowModal}/>}
+
       { showMenu && <MenuModal setShowMenu={setShowMenu} currentYear={currentYear} yearChange={yearChange} /> }
-      { showModal && <PhotoModal currentPhoto={currentPhoto} setShowModal={setShowModal}/>}
     </main>
   );
 }
